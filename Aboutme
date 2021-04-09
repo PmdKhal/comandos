@@ -1,0 +1,31 @@
+const Discord = require('discord.js');
+const db = require('quick.db');
+
+module.exports = {
+	name: 'About me',
+	aliases: ['aboutme'],
+	run: async (client, message, args) => {
+		let aaa = await db.get(`aaa_${message.author.id}`);
+
+   let aboutme = args.splice(0).join(' ');
+   if(!aboutme) {
+     return message.channel.send(`digite depois da sintaxe, como você quer que fique seu *About me**`)
+   } else if (aboutme.length > 500) {
+   
+   return message.channel.send("faça um About me menor")
+
+  } else {
+
+		let embed = new Discord.MessageEmbed()
+			.setTitle('About me:')
+			.setDescription(
+				`seu aboutme ficou assim: **${aboutme}**\nuse <<perfil para ver o que tem de novo`
+			)
+			.setColor('RANDOM');
+
+		message.channel.send(embed)
+
+    db.set(`aaa_${message.author.id}`, aboutme)
+   }
+	}
+};
