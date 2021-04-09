@@ -1,0 +1,41 @@
+module.exports = {
+	name: 'addcmd',
+	run: async (client, message, args) => {
+		if (!message.member.hasPermission('MANAGE_MESSAGES'))
+			return message.reply(
+				'você precisa da permissão de `MANAGE_MESSAGES` para usar esse comando.'
+			);
+		let cmdname = args[0];
+		if (!cmdname)
+			return message.channel.send(
+				`:x: Forneça o nome e a resposta do comando personalizado, \`addcmd <nome_cmd> <resposta_cmd>\``
+			);
+		let cmdresponce = args.slice(1).join(' ');
+		if (!cmdresponce)
+			return message.reply(
+				`forneça o nome e a resposta do comando personalizado, \`addcmd <nome_cmd> <resposta_cmd>\``
+			);
+		let command = client.commands.get(cmdname);
+		if (!command) command = client.commands.get(client.aliases.get(cmdname));
+		if (command)
+			return message.reply(
+				'esse nome de comando não pode ser adicionado pois ele é um comando padrão meu.'
+			);
+		let cmdx = await client.db
+			.ref(`guild/${message.guild.id}/cmd/${cmdname}`)
+			.once('value');
+		cmdx = cmdx.val();
+		if (!cmdx) {
+			client.db
+				.ref(`guild/${message.guild.id}/cmd/${cmdname}`)
+				.set(cmdresponce);
+			message.reply(
+				`o comando personalizado {${cmdname.toLowerCase()}} foi adicionado neste servidor.`
+			);
+		} else {
+			message.reply(
+				'este nome de comando já está adicionado aos comandos personalizados do servidor.'
+			);
+		}
+	}
+};
